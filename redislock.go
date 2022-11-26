@@ -1,6 +1,8 @@
 package redlockimp
 
+import "context"
+
 type Locker interface {
-	Lock(key string) error
-	Unlock() error
+	Lock(ctx context.Context) error
+	Unlock(ctx context.Context) error
 }

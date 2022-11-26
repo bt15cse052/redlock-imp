@@ -1,6 +1,7 @@
 package redlockimp
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -17,7 +18,7 @@ type locker struct {
 	Drift   time.Duration
 }
 
-func (l *locker) Lock() error {
+func (l *locker) Lock(ctx context.Context) error {
 	var scriptLock = `
 	if redis.call("EXISTS", KEYS[1]) == 1 then
 		return 0
@@ -27,7 +28,7 @@ func (l *locker) Lock() error {
 	totallocks := 0
 	for _, rc := range l.Clients {
 		start := time.Now()
-		res, err := rc.Eval(nil, scriptLock, []string{l.KeyName}, l.KeyVal, l.Expiry.Milliseconds()).Result()
+		res, err := rc.Eval(ctx, scriptLock, []string{l.KeyName}, l.KeyVal, l.Expiry.Milliseconds()).Result()
 		if err != nil {
 			return err
 		}
@@ -45,7 +46,7 @@ func (l *locker) Lock() error {
 	return nil
 }
 
-func (l *locker) Unlock() error {
+func (l *locker) Unlock(ctx context.Context) error {
 	totalSuccess := 0
 	var scriptUnlock = `
 	if redis.call("GET", KEYS[1]) == ARGV[1] then
