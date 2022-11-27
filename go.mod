@@ -1,4 +1,4 @@
-module redlock-imp
+module github.com/bt15cse052/redlock-imp
 
 go 1.19
 
