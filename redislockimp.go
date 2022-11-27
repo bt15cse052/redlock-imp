@@ -34,7 +34,7 @@ func (l *locker) Lock(ctx context.Context) error {
 		}
 		ok := res == "OK"
 		now := time.Now()
-		if ok && (l.Expiry-now.Sub(start)) > 0 {
+		if ok && (l.Expiry-now.Sub(start)-l.Drift) > 0 {
 			totallocks++
 		}
 	}
